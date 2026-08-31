@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { ShopProvider } from "@/store/shop";
@@ -14,7 +14,46 @@ import { Saved } from "@/pages/Saved";
 import { Checkout } from "@/pages/Checkout";
 import { NotFound } from "@/pages/NotFound";
 
+/**
+ * Shoppers should not download the admin panel to look at a product, so it is
+ * a separate chunk fetched only when someone actually goes to /admin.
+ */
+const AdminApp = lazy(() =>
+  import("@/admin/AdminApp").then((m) => ({ default: m.AdminApp })),
+);
+
+/**
+ * Two apps behind one router. The admin section gets its own chrome and its own
+ * providers — it has no use for a cart drawer — so it branches above the
+ * storefront shell rather than inside it.
+ */
 export function App() {
+  return (
+    <Routes>
+      <Route
+        path="/admin/*"
+        element={
+          <Suspense fallback={<AdminLoading />}>
+            <AdminApp />
+          </Suspense>
+        }
+      />
+      <Route path="*" element={<Storefront />} />
+    </Routes>
+  );
+}
+
+function AdminLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-canvas">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink-45">
+        Loading the panel…
+      </p>
+    </div>
+  );
+}
+
+function Storefront() {
   return (
     <ShopProvider>
       <div className="flex min-h-screen flex-col">

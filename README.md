@@ -75,6 +75,60 @@ number format), bKash / Nagad / card / cash-on-delivery selection, order review,
 an animated confirmation. No gateway is wired up; in production this step hands off
 to SSLCommerz or bKash Checkout and returns a transaction ID.
 
+## Admin panel
+
+Sign in at **`/admin`**:
+
+| | |
+| --- | --- |
+| Username | `saiful` |
+| Password | `abir12##` |
+
+> **This is a demo gate, not authentication.** The check runs in the browser, so
+> the credentials are readable in the shipped JavaScript. It exists so the panel
+> can be shown to somebody. Making it real is a change to `verify()` in
+> `src/admin/auth/AdminAuthProvider.tsx` alone — POST to your endpoint and store
+> the returned token instead of the flag. Nothing else in the panel needs to move.
+
+**Dashboard** — revenue, order count, average order value, and units shipped, each
+against the previous equivalent window, over a 7/30/90-day toggle. A hover-readable
+revenue chart, revenue split by category, best sellers, the latest orders, and a
+low-stock list you can restock from without leaving the page. Every chart is
+hand-drawn SVG; no charting library is installed.
+
+**Orders** — 84 seeded orders, filterable by status, searchable by reference, name,
+phone, or city, sortable, paginated, and exportable to CSV. Opening one shows the
+customer, the lines at the price they were bought at, the totals, and the fulfilment
+actions: advance one step along pending → confirmed → packed → shipped → delivered,
+or cancel while it is still in the warehouse.
+
+**Products** — the full catalogue with search, category and stock filters, sorting,
+and bulk select for deleting or restocking. The editor validates as a shop owner
+would want: a struck-through price has to be higher than the live one, stock has to
+be a whole number, a rating has to fit on a five-star scale. Product artwork is
+generated from the category, so adding a product needs no image upload.
+
+**Customers** — derived from the orders rather than stored separately, keyed by phone
+number, with lifetime spend, order count, and a per-person history.
+
+**Settings** — shop name, support number, delivery fee, free-delivery threshold,
+promo code and percentage, and the low-stock threshold. Plus a reset that rebuilds
+the demo data from the seed.
+
+### It really drives the storefront
+
+Product edits and settings changes are not admin-only decoration. Both are written
+to `localStorage`, and `catalogue.ts` and `format.ts` read them once at module load —
+so changing a price in the panel changes it on the product page, and moving the
+free-delivery threshold moves it in the bag, on the storefront's next load.
+
+Reading at load rather than through a context is a deliberate trade: an edit needs a
+page load to appear, and in exchange every existing call site, and the tests that run
+without a DOM, stay exactly as they were.
+
+The demo data is generated from a seeded PRNG, so the dashboard shows the same
+numbers every time — a client clicking around should not watch the figures move.
+
 ## Motion
 
 All variants live in `src/lib/motion.ts` so timing and easing stay consistent. One
@@ -109,7 +163,20 @@ src/
   data/          catalogue.ts — typed products and categories
   lib/           format.ts (money, discounts), totals.ts (bag maths),
                  stock.ts (quantity clamping), motion.ts (variants)
+
+  admin/         AdminApp.tsx — routes and the signed-in guard
+    auth/        AdminAuthProvider + context (swap verify() for a real API)
+    data/        AdminDataProvider + context — products, orders, settings
+    components/  AdminLayout, charts (SVG), ui (panels, drawers, dialogs)
+    pages/       Login, Dashboard, Orders, Products, ProductEditor,
+                 Customers, Settings
+    lib/         orders.ts (metrics), seed.ts (demo data), product-draft.ts,
+                 types.ts
 ```
+
+The admin panel is a lazily-loaded chunk, so a shopper browsing products never
+downloads it: the storefront entry is 125 kB gzipped and the panel is a separate
+20 kB fetched only at `/admin`.
 
 `ShopProvider` owns all commerce state. Pages read it through `useShop()` and never
 hold cart state locally. The context and hook sit in their own module so editing
@@ -122,14 +189,17 @@ tested without mounting React.
 ## Tests
 
 `npm run test` runs Vitest over the pure layers — the bag totals, currency and
-discount formatting, quantity clamping, and the URL filter parse/serialise round
-trip. 40 assertions, no DOM required.
+discount formatting, quantity clamping, the URL filter parse/serialise round trip,
+and the admin's order metrics, status flow, demo-data generator, and product-form
+validation. 83 assertions, no DOM required.
 
 Things worth knowing that the tests pin down: the promo is applied *before* the
 free-delivery threshold is tested, so discounting below ৳2,500 does reinstate the
 fee; a quantity is always clamped to the stock the catalogue reports; and a
 persisted bag is re-validated on load, so a product that has left the catalogue
-disappears from the cart instead of crashing it.
+disappears from the cart instead of crashing it. On the admin side: an old order
+keeps the price it was bought at, cancelled orders are counted but never banked, and
+the demo generator never leaves a two-month-old order sitting at "pending".
 
 ## Accessibility
 

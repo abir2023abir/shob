@@ -56,7 +56,8 @@ const WAYS: Colorway[] = [
   { name: "Moss", hex: "#5A6B4B" },
 ];
 
-export const PRODUCTS: Product[] = [
+/** The catalogue as shipped. The admin panel edits a copy of this. */
+export const SEED_PRODUCTS: Product[] = [
   // ── Electronics ────────────────────────────────────────────────
   {
     id: "e1", cat: "electronics", name: "Aurora 14 Ultrabook", brand: "Nova",
@@ -315,9 +316,48 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
+/** Where the admin panel saves its edits to the catalogue. */
+export const CATALOGUE_KEY = "shob.catalogue.v1";
+
+function looksLikeProduct(value: unknown): value is Product {
+  const p = value as Partial<Product> | null;
+  return (
+    !!p &&
+    typeof p.id === "string" &&
+    typeof p.name === "string" &&
+    typeof p.brand === "string" &&
+    typeof p.cat === "string" &&
+    Number.isFinite(p.price) &&
+    Number.isFinite(p.stock) &&
+    Array.isArray(p.specs)
+  );
+}
+
+/**
+ * The storefront reads whatever the admin panel last saved, falling back to the
+ * shipped seed. Reading once at module load rather than through a context keeps
+ * every existing call site — and the tests, which run without a DOM — unchanged;
+ * an admin edit shows up on the next page load.
+ */
+function publishedCatalogue(): Product[] {
+  if (typeof window === "undefined") return SEED_PRODUCTS;
+  try {
+    const raw = window.localStorage.getItem(CATALOGUE_KEY);
+    if (!raw) return SEED_PRODUCTS;
+    const saved: unknown = JSON.parse(raw);
+    if (!Array.isArray(saved)) return SEED_PRODUCTS;
+    const clean = saved.filter(looksLikeProduct);
+    return clean.length ? clean : SEED_PRODUCTS;
+  } catch {
+    return SEED_PRODUCTS;
+  }
+}
+
+export const PRODUCTS: Product[] = publishedCatalogue();
+
 export const BRANDS = [...new Set(PRODUCTS.map((p) => p.brand))].sort();
-export const MAX_PRICE = Math.max(...PRODUCTS.map((p) => p.price));
-export const MIN_PRICE = Math.min(...PRODUCTS.map((p) => p.price));
+export const MAX_PRICE = PRODUCTS.length ? Math.max(...PRODUCTS.map((p) => p.price)) : 0;
+export const MIN_PRICE = PRODUCTS.length ? Math.min(...PRODUCTS.map((p) => p.price)) : 0;
 
 export const categoryOf = (id: CategoryId): Category =>
   CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[0];

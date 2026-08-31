@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Heart, Plus, Eye } from "lucide-react";
@@ -21,16 +22,15 @@ interface Props {
   onQuickView: (product: Product) => void;
 }
 
-export function ProductCard({
-  product,
-  currency,
-  view = "grid",
-  query = "",
-  wished,
-  onWish,
-  onAdd,
-  onQuickView,
-}: Props) {
+/**
+ * Forwards its ref because the shop grid runs `AnimatePresence` in `popLayout`
+ * mode, which measures the outgoing card before it leaves — without the ref it
+ * cannot, and the exit shuffle is measured against nothing.
+ */
+export const ProductCard = forwardRef<HTMLElement, Props>(function ProductCard(
+  { product, currency, view = "grid", query = "", wished, onWish, onAdd, onQuickView },
+  ref,
+) {
   const out = product.stock === 0;
   const low = product.stock > 0 && product.stock <= 8;
   const off = discountPercent(product.price, product.old);
@@ -38,6 +38,7 @@ export function ProductCard({
 
   return (
     <motion.article
+      ref={ref}
       layout
       variants={cardIn}
       exit="exit"
@@ -146,4 +147,4 @@ export function ProductCard({
       </div>
     </motion.article>
   );
-}
+});
