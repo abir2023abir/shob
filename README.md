@@ -5,7 +5,10 @@ variant selection, a persistent bag, and a three-step checkout with Bangladeshi
 payment options.
 
 Every product image is drawn in code as an SVG, so the catalogue has no external
-image dependencies, nothing can 404, and the whole site ships in one bundle.
+image dependencies, nothing can 404, and the whole site ships in one bundle. Each
+of the forty products has its own drawing in `src/components/product-art/scenes.tsx`
+— the ultrabook looks like an ultrabook, the saree like a saree — and the four
+gallery thumbnails move the camera over that one drawing rather than recolouring it.
 
 ## Run it
 
@@ -105,8 +108,9 @@ or cancel while it is still in the warehouse.
 **Products** — the full catalogue with search, category and stock filters, sorting,
 and bulk select for deleting or restocking. The editor validates as a shop owner
 would want: a struck-through price has to be higher than the live one, stock has to
-be a whole number, a rating has to fit on a five-star scale. Product artwork is
-generated from the category, so adding a product needs no image upload.
+be a whole number, a rating has to fit on a five-star scale. Every catalogue
+product has its own drawing, and a product added in the panel falls back to a
+generic shape for its category, so adding one needs no image upload.
 
 **Customers** — derived from the orders rather than stored separately, keyed by phone
 number, with lifetime spend, order count, and a per-person history.
@@ -156,6 +160,7 @@ components that animate continuously.
 src/
   components/    Header, CartDrawer, QuickView, ProductCard, FilterPanel,
                  ProductArt, AuroraField, Reveal, Toaster, Footer, Skeleton
+    product-art/ scenes.tsx — one SVG drawing per catalogue product
   pages/         Home, Shop, ProductPage, Saved, Checkout, NotFound
   store/         shop.tsx         — provider: reducer, persistence, hydration
                  shop-context.ts  — context, useShop, the value's types
