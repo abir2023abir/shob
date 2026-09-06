@@ -120,9 +120,9 @@ export function HeaderSearch({
         }}
       >
         <div
-          className={`group relative flex items-center rounded-2xl border bg-surface shadow-[0_1px_0_rgba(23,20,37,0.03)] transition-all duration-300 ${
+          className={`group relative flex items-center rounded-2xl border bg-surface shadow-[0_1px_0_rgba(23,20,37,0.03)] transition-[border-color,box-shadow,height] duration-300 ${
             showing ? "border-violet ring-4 ring-violet/10" : "border-line hover:border-ink-20"
-          } ${compact ? "h-10" : "h-11"}`}
+          } ${compact ? "h-10" : "h-11 [[data-compact=true]_&]:h-10"}`}
         >
           <Search
             size={16}

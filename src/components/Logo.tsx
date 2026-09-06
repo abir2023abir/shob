@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { memo, useId } from "react";
 
 /**
  * The mark is a monogram and a category sign at once: a shopping bag with an
@@ -7,7 +7,7 @@ import { useId } from "react";
  * sitting on it, which is what stops the whole thing looking like an icon
  * from a set. Drawn once here and mirrored in `public/favicon.svg`.
  */
-export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
+export const LogoMark = memo(function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
   const uid = useId().replace(/:/g, "");
 
   return (
@@ -59,7 +59,7 @@ export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
       />
     </svg>
   );
-}
+});
 
 interface Props {
   /** `light` for the dark footer, `dark` for the white header. */
@@ -70,27 +70,31 @@ interface Props {
 }
 
 /** Mark plus wordmark, locked up. */
-export function Logo({ tone = "dark", compact = false, className = "" }: Props) {
+export const Logo = memo(function Logo({ tone = "dark", compact = false, className = "" }: Props) {
   const word = tone === "dark" ? "text-ink" : "text-white";
   const rule = tone === "dark" ? "text-ink-45" : "text-white/50";
 
   return (
     <span className={`flex items-center gap-2.5 ${className}`}>
       <LogoMark
-        className={`shrink-0 transition-all duration-300 ${compact ? "h-7 w-7" : "h-[34px] w-[34px]"}`}
+        className={`shrink-0 transition-[width,height] duration-300 ${
+          compact ? "h-7 w-7" : "h-[34px] w-[34px] [[data-compact=true]_&]:h-7 [[data-compact=true]_&]:w-7"
+        }`}
       />
       <span className="flex flex-col leading-none">
         <span
-          className={`font-display font-extrabold tracking-tightest transition-all duration-300 ${word} ${
-            compact ? "text-[19px]" : "text-[23px]"
+          className={`font-display font-extrabold tracking-tightest transition-[font-size] duration-300 ${word} ${
+            compact ? "text-[19px]" : "text-[23px] [[data-compact=true]_&]:text-[19px]"
           }`}
         >
           shob
           <span className="text-marigold">.</span>
         </span>
         <span
-          className={`hidden overflow-hidden font-mono font-semibold uppercase tracking-[0.3em] transition-all duration-300 sm:block ${rule} ${
-            compact ? "mt-0 max-h-0 text-[0px] opacity-0" : "mt-[4px] max-h-3 text-[8px] opacity-100"
+          className={`hidden overflow-hidden font-mono font-semibold uppercase tracking-[0.3em] transition-[margin,max-height,opacity,font-size] duration-300 sm:block ${rule} ${
+            compact
+              ? "mt-0 max-h-0 text-[0px] opacity-0"
+              : "mt-[4px] max-h-3 text-[8px] opacity-100 [[data-compact=true]_&]:mt-0 [[data-compact=true]_&]:max-h-0 [[data-compact=true]_&]:text-[0px] [[data-compact=true]_&]:opacity-0"
           }`}
         >
           Everything
@@ -98,4 +102,4 @@ export function Logo({ tone = "dark", compact = false, className = "" }: Props) 
       </span>
     </span>
   );
-}
+});

@@ -30,14 +30,22 @@ export function Header() {
 
   // The rail folds away as you read down the page and comes back the moment
   // you scroll up, so navigation is never more than a flick away.
-  const [compact, setCompact] = useState(false);
+  // Driven via data-compact attribute on the header element so React never
+  // re-renders during scroll.
+  const headerRef = useRef<HTMLElement>(null);
   const lastY = useRef(0);
+  const isCompact = useRef(false);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const down = y > lastY.current;
     lastY.current = y;
-    if (y < CONDENSE_AT) setCompact(false);
-    else if (down !== compact) setCompact(down);
+    const next = y >= CONDENSE_AT && down;
+    if (next !== isCompact.current) {
+      isCompact.current = next;
+      if (headerRef.current) {
+        headerRef.current.dataset.compact = String(next);
+      }
+    }
   });
 
   // Keep the field in sync when the URL query changes from elsewhere.
@@ -59,20 +67,22 @@ export function Header() {
   return (
     <CategoryMenu>
       {(menu) => (
-        <header className="sticky top-0 z-40 border-b border-line/80 bg-canvas/90 backdrop-blur-md">
+        <header
+          ref={headerRef}
+          data-compact="false"
+          className="sticky top-0 z-40 border-b border-line/80 bg-canvas/90 backdrop-blur-md will-change-transform [transform:translateZ(0)]"
+        >
           <motion.div
-            className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-gradient-to-r from-violet via-rose to-marigold"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 origin-left bg-gradient-to-r from-violet via-rose to-marigold"
             style={{ scaleX: progress }}
             aria-hidden
           />
 
           <div
-            className={`mx-auto flex max-w-7xl items-center gap-3 px-4 transition-[padding] duration-300 sm:px-6 ${
-              compact ? "py-2" : "py-3"
-            }`}
+            className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 transition-[padding] duration-300 sm:px-6 [[data-compact=true]_&]:py-2"
           >
             <Link to="/" className="shrink-0" aria-label="Shob — home">
-              <Logo compact={compact} />
+              <Logo />
             </Link>
 
             <div className="mx-2 hidden min-w-0 flex-1 justify-center md:flex">
@@ -81,7 +91,6 @@ export function Header() {
                   term={term}
                   onTermChange={setTerm}
                   onSubmit={submit}
-                  compact={compact}
                   hotkey
                 />
               </div>
@@ -167,11 +176,7 @@ export function Header() {
             <HeaderSearch term={term} onTermChange={setTerm} onSubmit={submit} compact />
           </div>
 
-          <motion.div
-            animate={{ height: compact ? 0 : "auto", opacity: compact ? 0 : 1 }}
-            transition={{ duration: 0.26, ease: EASE }}
-            className="overflow-hidden"
-          >
+          <div className="rail-wrapper overflow-hidden">
             <nav
               className="no-scrollbar mx-auto flex max-w-7xl gap-1.5 overflow-x-auto px-4 pb-3 sm:px-6"
               aria-label="Categories"
@@ -188,7 +193,7 @@ export function Header() {
                 />
               ))}
             </nav>
-          </motion.div>
+          </div>
 
           <MegaPanel open={menu.open} onClose={menu.close} onKeep={menu.hold} />
         </header>
@@ -227,10 +232,8 @@ function RailLink({
       }`}
     >
       {active && (
-        <motion.span
-          layoutId="rail-pill"
+        <span
           className="absolute inset-0 rounded-full bg-ink"
-          transition={spring}
         />
       )}
       <span className="relative flex items-center gap-1.5">
