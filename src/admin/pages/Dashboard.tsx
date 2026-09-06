@@ -285,7 +285,7 @@ function LowStockRow({ id }: { id: string }) {
 
   return (
     <li className="flex items-center gap-3 px-4 py-2.5">
-      <ProductArt product={product} className="aspect-square w-9 shrink-0 rounded-lg" />
+      <ProductArt product={product} sizes="36px" className="aspect-square w-9 shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] font-semibold text-ink">{product.name}</p>
         <p className={`font-mono text-[11px] ${out ? "text-rose" : "text-marigold-deep"}`}>

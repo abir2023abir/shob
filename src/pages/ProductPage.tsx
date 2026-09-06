@@ -68,7 +68,14 @@ function Detail({ product }: { product: Product }) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
               >
-                <ProductArt product={product} angle={angle} animate className="block aspect-square w-full" />
+                <ProductArt
+                  product={product}
+                  angle={angle}
+                  animate
+                  priority
+                  sizes="(min-width: 1024px) 46vw, 94vw"
+                  className="block aspect-square w-full"
+                />
               </motion.div>
             </AnimatePresence>
           </motion.div>
@@ -85,7 +92,7 @@ function Detail({ product }: { product: Product }) {
                   angle === a ? "border-violet" : "border-line"
                 }`}
               >
-                <ProductArt product={product} angle={a} className="block aspect-square w-full" />
+                <ProductArt product={product} angle={a} sizes="110px" className="block aspect-square w-full" />
               </button>
             ))}
           </motion.div>

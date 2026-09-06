@@ -1,8 +1,8 @@
 /**
  * Every catalogue product is shot twice — a packshot and a second look — and
- * both files live in `public/products` as square 760px JPEGs. The gallery
- * builds its four views out of those two frames (see `ProductArt`), which is
- * how a real store with a two-shot budget does it.
+ * each frame ships at two sizes: 760px for the product page, 300px for the
+ * thumbnails. The gallery builds its four views out of the two frames (see
+ * `ProductArt`), which is how a real store with a two-shot budget does it.
  *
  * Products the admin panel invents at runtime have no photos, so they fall
  * back to a drawn category shape rather than a broken image.
@@ -24,7 +24,22 @@ export function hasPhotos(id: string): boolean {
   return SHOT.has(id);
 }
 
-/** `frame` 0 is the packshot, 1 the second look. */
+function slotOf(frame: 0 | 1): "a" | "b" {
+  return frame === 0 ? "a" : "b";
+}
+
+/** The full-size frame. `frame` 0 is the packshot, 1 the second look. */
 export function photoSrc(id: string, frame: 0 | 1): string {
-  return `/products/${id}-${frame === 0 ? "a" : "b"}.jpg`;
+  return `/products/${id}-${slotOf(frame)}.jpg`;
+}
+
+/**
+ * Both sizes, for the browser to choose between. A tile in the grid is about
+ * 150px wide; without this it decodes the 760px bitmap — six times the pixels
+ * it can show — for every thumbnail, and the homepage alone was decoding 35
+ * megapixels before it could draw a frame.
+ */
+export function photoSrcSet(id: string, frame: 0 | 1): string {
+  const slot = slotOf(frame);
+  return `/products/${id}-${slot}-sm.jpg 300w, /products/${id}-${slot}.jpg 760w`;
 }

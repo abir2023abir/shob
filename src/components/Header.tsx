@@ -59,7 +59,7 @@ export function Header() {
   return (
     <CategoryMenu>
       {(menu) => (
-        <header className="sticky top-0 z-40 border-b border-line/80 bg-canvas/75 backdrop-blur-xl backdrop-saturate-150">
+        <header className="sticky top-0 z-40 border-b border-line/80 bg-canvas/90 backdrop-blur-md">
           <motion.div
             className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-gradient-to-r from-violet via-rose to-marigold"
             style={{ scaleX: progress }}
@@ -324,7 +324,7 @@ function MegaPanel({
           transition={{ duration: 0.2, ease: EASE }}
           onMouseEnter={onKeep}
           onMouseLeave={onClose}
-          className="absolute inset-x-0 top-full hidden border-b border-line bg-surface/95 shadow-lift backdrop-blur-xl lg:block"
+          className="absolute inset-x-0 top-full hidden border-b border-line bg-surface shadow-lift lg:block"
         >
           <div className="mx-auto flex max-w-7xl gap-8 px-6 py-6">
             <div className="w-52 shrink-0">
@@ -359,6 +359,7 @@ function MegaPanel({
                 >
                   <ProductArt
                     product={p}
+                    sizes="220px"
                     className="block aspect-[4/3] w-full rounded-2xl transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                   <p className="mt-2 truncate text-[13px] font-semibold text-ink">{p.name}</p>

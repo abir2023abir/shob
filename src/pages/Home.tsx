@@ -60,7 +60,7 @@ export function Home() {
           <motion.div variants={stagger(0.1, 0.09)} initial="hidden" animate="show">
             <motion.span
               variants={fadeUp}
-              className="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/80 py-1.5 pl-2 pr-3.5 text-xs font-semibold text-ink-70 shadow-[0_1px_2px_rgba(23,20,37,0.04)] backdrop-blur"
+              className="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/80 py-1.5 pl-2 pr-3.5 text-xs font-semibold text-ink-70 shadow-[0_1px_2px_rgba(23,20,37,0.04)]"
             >
               <span className="relative flex h-4 w-4 items-center justify-center">
                 <span className="absolute inline-flex h-4 w-4 animate-ping rounded-full bg-jade/30" />
@@ -109,7 +109,7 @@ export function Home() {
               </Link>
               <Link
                 to="/shop?sort=rating"
-                className="inline-flex items-center gap-2 rounded-2xl border border-line bg-surface/80 px-6 py-4 text-[14.5px] font-semibold text-ink backdrop-blur transition-colors hover:border-ink-20"
+                className="inline-flex items-center gap-2 rounded-2xl border border-line bg-surface px-6 py-4 text-[14.5px] font-semibold text-ink transition-colors hover:border-ink-20"
               >
                 Browse best rated
               </Link>
@@ -151,7 +151,7 @@ export function Home() {
         </motion.div>
 
         {/* Category marquee */}
-        <div className="relative border-y border-line bg-surface/70 py-3 backdrop-blur">
+        <div className="relative border-y border-line bg-surface py-3">
           <div className="flex w-max animate-marquee gap-8 whitespace-nowrap">
             {[...CATEGORIES, ...CATEGORIES].map((c, i) => (
               <span

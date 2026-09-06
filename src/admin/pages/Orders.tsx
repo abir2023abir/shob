@@ -350,7 +350,7 @@ function OrderDetail({ order, onClose }: { order: Order | null; onClose: () => v
                 return (
                   <li key={line.id} className="flex items-center gap-3">
                     {product ? (
-                      <ProductArt product={product} className="aspect-square w-11 rounded-xl" />
+                      <ProductArt product={product} sizes="44px" className="aspect-square w-11 rounded-xl" />
                     ) : (
                       <span className="flex aspect-square w-11 items-center justify-center rounded-xl bg-canvas font-mono text-[10px] text-ink-45">
                         n/a

@@ -322,7 +322,7 @@ export function Checkout() {
                   <motion.ul variants={fadeUp} className="space-y-3">
                     {lines.map((l) => (
                       <li key={l.key} className="flex items-center gap-3">
-                        <ProductArt product={l.product} className="aspect-square w-12 rounded-xl" />
+                        <ProductArt product={l.product} sizes="48px" className="aspect-square w-12 rounded-xl" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-[13.5px] font-semibold text-ink">
                             {l.product.name}

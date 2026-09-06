@@ -74,7 +74,7 @@ export const ProductCard = forwardRef<HTMLElement, Props>(function ProductCard(
           <button
             type="button"
             onClick={() => onQuickView(product)}
-            className="absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-xl bg-surface/95 px-3 py-2 text-xs font-semibold text-ink shadow-lift backdrop-blur transition-all duration-300 hover:scale-[1.03] focus-visible:opacity-100 group-hover:opacity-100 sm:flex sm:opacity-0"
+            className="absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-xl bg-surface px-3 py-2 text-xs font-semibold text-ink shadow-lift transition-all duration-300 hover:scale-[1.03] focus-visible:opacity-100 group-hover:opacity-100 sm:flex sm:opacity-0"
           >
             <Eye size={13} /> Quick view
           </button>

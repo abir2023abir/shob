@@ -80,7 +80,7 @@ export function ProductEditor({
     >
       <div className="space-y-4">
         <div className="flex items-center gap-4 rounded-2xl border border-line bg-canvas/50 p-3">
-          <ProductArt product={preview} className="aspect-square w-20 shrink-0 rounded-xl" />
+          <ProductArt product={preview} sizes="80px" className="aspect-square w-20 shrink-0 rounded-xl" />
           <div className="min-w-0">
             <p className="truncate font-display text-[15px] font-bold text-ink">{preview.name}</p>
             <p className="font-mono text-[11.5px] text-ink-45">

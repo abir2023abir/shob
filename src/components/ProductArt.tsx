@@ -1,6 +1,6 @@
 import { memo, useId, type ReactNode } from "react";
 import { categoryOf, type CategoryId, type Product } from "@/data/catalogue";
-import { hasPhotos, photoSrc } from "./product-photos";
+import { hasPhotos, photoSrc, photoSrcSet } from "./product-photos";
 
 interface Props {
   product: Product;
@@ -9,6 +9,12 @@ interface Props {
   className?: string;
   /** Load eagerly — set on the one image that is above the fold. */
   priority?: boolean;
+  /**
+   * Roughly how wide this instance renders, as a `sizes` value. Getting it
+   * near-right is what lets the browser fetch the 300px frame for a thumbnail
+   * instead of the 760px one.
+   */
+  sizes?: string;
   /** Accepted by the gallery call sites; the CSS fade handles the entrance. */
   animate?: boolean;
 }
@@ -126,7 +132,13 @@ function DrawnFallback({ product, className }: { product: Product; className?: s
   );
 }
 
-function ProductArtBase({ product, angle = 0, className, priority = false }: Props) {
+function ProductArtBase({
+  product,
+  angle = 0,
+  className,
+  priority = false,
+  sizes = "(min-width: 640px) 25vw, 45vw",
+}: Props) {
   if (!hasPhotos(product.id)) {
     return <DrawnFallback product={product} className={className} />;
   }
@@ -137,6 +149,8 @@ function ProductArtBase({ product, angle = 0, className, priority = false }: Pro
     <div className={`relative overflow-hidden bg-canvas ${className ?? ""}`}>
       <img
         src={photoSrc(product.id, view.frame)}
+        srcSet={photoSrcSet(product.id, view.frame)}
+        sizes={sizes}
         alt={`${product.name} by ${product.brand}`}
         width={760}
         height={760}
