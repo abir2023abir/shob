@@ -10,14 +10,15 @@ import { ProductArt } from "./ProductArt";
  * vanish against the tile. The middle column travels the other way, which is
  * what stops the whole thing reading as one sheet sliding past.
  *
- * Three per column is the floor for a seamless loop: the list is rendered
- * twice and translated by half its height, so half the strip has to be taller
- * than the column or a gap opens at the turn.
+ * Four per column, because the strip is rendered twice and translated by half
+ * its height: one copy has to be taller than the column at every width the
+ * wall is shown at, or a gap opens at the turn. Three was enough at 1280px
+ * and four pixels short at 1024.
  */
 const COLUMNS: [string[], string[], string[]] = [
-  ["f4", "g3", "h4"],
-  ["e2", "h3", "f1"],
-  ["e4", "t1", "g4"],
+  ["f4", "g3", "h4", "b2"],
+  ["e2", "h3", "f1", "g1"],
+  ["e4", "t1", "g4", "s5"],
 ];
 
 const SPEED = ["34s", "40s", "29s"];
@@ -82,7 +83,7 @@ export function HeroWall() {
   const scrolling = useScrolling();
 
   // Two reasons to hold still. Off-screen is obvious — nobody can see it. The
-  // other is that animating eighteen photographs while the page is moving is
+  // other is that animating two dozen photographs while the page is moving is
   // what made scrolling stutter: measured on production, it was the difference
   // between one frame in four missing its deadline and one in nine. It starts
   // again a moment after you stop, which is when you are actually looking.
@@ -103,7 +104,7 @@ export function HeroWall() {
   return (
     <div
       ref={ref}
-      className="group/wall relative h-[460px] select-none sm:h-[520px] lg:h-[580px]"
+      className="group/wall relative h-[380px] select-none sm:h-[520px] lg:h-[580px]"
       // The wall is decoration: every product in it is reachable from the grid
       // below, so screen readers are better served skipping the whole thing.
       aria-hidden
@@ -119,8 +120,16 @@ export function HeroWall() {
 
           return (
             <div key={col} className="relative overflow-hidden">
+              {/*
+                The spacing is padding on each tile rather than `gap` on the
+                strip. A flex gap sits between tiles but not after the last
+                one, so six tiles are five gaps and half the strip is half a
+                gap short of one copy — the loop lands a few pixels out and
+                visibly jumps once a cycle. Padding makes every tile the same
+                height, so half of two copies is exactly one copy.
+              */}
               <div
-                className={`flex flex-col gap-2.5 sm:gap-3 ${
+                className={`flex flex-col ${
                   reduce ? "" : col === 1 ? "animate-scroll-down" : "animate-scroll-up"
                 } group-hover/wall:[animation-play-state:paused]`}
                 style={{
@@ -133,7 +142,9 @@ export function HeroWall() {
                 }}
               >
                 {loop.map((p, i) => (
-                  <Tile key={`${p.id}-${i}`} product={p} eager={i < 2} />
+                  <div key={`${p.id}-${i}`} className="pb-2.5 sm:pb-3">
+                    <Tile product={p} eager={i < 2} />
+                  </div>
                 ))}
               </div>
             </div>
