@@ -1,11 +1,12 @@
-import { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform } from "motion/react";
-import { ArrowRight, RotateCcw, Search, ShieldCheck, Truck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
+import { ArrowRight, RotateCcw, ShieldCheck, TrendingUp, Truck } from "lucide-react";
 import { CATEGORIES, PRODUCTS, type Product } from "@/data/catalogue";
 import { useShop } from "@/store/shop-context";
-import { fadeUp, lineUp, stagger } from "@/lib/motion";
+import { EASE, fadeUp, lineUp, stagger } from "@/lib/motion";
 import { AuroraField } from "@/components/AuroraField";
+import { HeroWall } from "@/components/HeroWall";
 import { ProductArt } from "@/components/ProductArt";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal, RevealGroup } from "@/components/Reveal";
@@ -14,13 +15,6 @@ import { QuickView } from "@/components/QuickView";
 
 const HEADLINE = ["Everything you", "actually need,", "in one bag."];
 
-/**
- * The hero wall is hand-picked rather than sliced off the catalogue: it needs
- * one product from most categories and enough colour between them that the
- * grid reads as a picture. Anything shot on white paper disappears here.
- */
-const WALL = ["f4", "e2", "h4", "g3", "s1", "f1", "h3", "t4", "g1"];
-
 const TRUST = [
   { icon: Truck, title: "48-hour delivery", body: "Dhaka and Rajshahi next day, everywhere else within two." },
   { icon: RotateCcw, title: "7-day returns", body: "Send it back unopened and the refund clears in three days." },
@@ -28,9 +22,7 @@ const TRUST = [
 ];
 
 export function Home() {
-  const navigate = useNavigate();
   const { currency, add, toggleWish, isWished } = useShop();
-  const [term, setTerm] = useState("");
   const [quick, setQuick] = useState<Product | null>(null);
 
   const heroRef = useRef<HTMLElement>(null);
@@ -41,18 +33,25 @@ export function Home() {
 
   const featured = PRODUCTS.filter((p) => p.badge).slice(0, 6);
   const reduced = PRODUCTS.filter((p) => p.old).slice(0, 6);
-  const wall = WALL.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean) as Product[];
 
-  const search = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate(term.trim() ? `/shop?q=${encodeURIComponent(term.trim())}` : "/shop");
-  };
 
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section ref={heroRef} className="relative overflow-hidden">
         <AuroraField />
+        {/* A fine rule grid, so the colour field has something to sit against. */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.55]"
+          aria-hidden
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(23,20,37,0.045) 1px, transparent 1px), linear-gradient(to bottom, rgba(23,20,37,0.045) 1px, transparent 1px)",
+            backgroundSize: "72px 72px",
+            maskImage: "radial-gradient(120% 90% at 30% 0%, #000 25%, transparent 78%)",
+            WebkitMaskImage: "radial-gradient(120% 90% at 30% 0%, #000 25%, transparent 78%)",
+          }}
+        />
 
         <motion.div
           style={{ y: copyY, opacity: fade }}
@@ -61,10 +60,17 @@ export function Home() {
           <motion.div variants={stagger(0.1, 0.09)} initial="hidden" animate="show">
             <motion.span
               variants={fadeUp}
-              className="inline-flex items-center gap-2 rounded-full bg-violet-soft px-3 py-1.5 text-xs font-semibold text-violet"
+              className="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/80 py-1.5 pl-2 pr-3.5 text-xs font-semibold text-ink-70 shadow-[0_1px_2px_rgba(23,20,37,0.04)] backdrop-blur"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-violet" />
+              <span className="relative flex h-4 w-4 items-center justify-center">
+                <span className="absolute inline-flex h-4 w-4 animate-ping rounded-full bg-jade/30" />
+                <span className="relative h-1.5 w-1.5 rounded-full bg-jade" />
+              </span>
               Delivering across Bangladesh
+              <span className="h-3 w-px bg-line" />
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-ink-45">
+                48h
+              </span>
             </motion.span>
 
             <h1 className="mt-5 text-[clamp(40px,7vw,72px)] font-extrabold leading-[0.98] text-ink">
@@ -72,59 +78,51 @@ export function Home() {
                 <span key={line} className="block overflow-hidden pb-1">
                   <motion.span
                     variants={lineUp}
-                    className={`block ${i === 2 ? "text-violet" : ""}`}
+                    // The last line hugs its text so the drawn stroke under it
+                    // is the width of the words, not of the whole column.
+                    className={`relative ${i === 2 ? "inline-block text-violet" : "block"}`}
                   >
                     {line}
+                    {i === 2 && <Underline />}
                   </motion.span>
                 </span>
               ))}
             </h1>
 
-            <motion.p variants={fadeUp} className="mt-5 max-w-md text-base leading-relaxed text-ink-70">
+            <motion.p variants={fadeUp} className="mt-6 max-w-md text-base leading-relaxed text-ink-70">
               Eight categories, one checkout. Search the whole catalogue and the grid rearranges as
               you type.
             </motion.p>
 
-            <motion.form variants={fadeUp} onSubmit={search} className="relative mt-6 max-w-md" role="search">
-              <Search
-                size={18}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-45"
-              />
-              <input
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                placeholder="Try “honey”, “keyboard”, “saree”…"
-                aria-label="Search the catalogue"
-                className="w-full rounded-2xl border border-line bg-surface py-4 pl-11 pr-28 text-[15px] shadow-lift transition-colors focus:border-violet"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-ink px-3.5 py-2.5 text-[13px] font-semibold text-white"
-              >
-                Search
-              </button>
-            </motion.form>
-
-            <motion.div variants={fadeUp} className="mt-4 flex flex-wrap items-center gap-3">
+            <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-3">
               <Link
                 to="/shop"
-                className="group inline-flex items-center gap-2 rounded-2xl bg-violet px-5 py-3.5 text-[14.5px] font-semibold text-white shadow-lift transition-colors hover:bg-violet-deep"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-ink px-6 py-4 text-[14.5px] font-semibold text-white shadow-pop"
               >
-                Get started
+                {/* A violet wash that wipes across on hover. */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-violet to-violet-deep transition-transform duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:translate-x-0" />
+                <span className="relative">Get started</span>
                 <ArrowRight
                   size={16}
-                  className="transition-transform group-hover:translate-x-0.5"
+                  className="relative transition-transform duration-300 group-hover:translate-x-1"
                 />
               </Link>
               <Link
                 to="/shop?sort=rating"
-                className="inline-flex items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3.5 text-[14.5px] font-semibold text-ink transition-colors hover:border-ink-20"
+                className="inline-flex items-center gap-2 rounded-2xl border border-line bg-surface/80 px-6 py-4 text-[14.5px] font-semibold text-ink backdrop-blur transition-colors hover:border-ink-20"
               >
                 Browse best rated
               </Link>
             </motion.div>
 
-            <motion.dl variants={fadeUp} className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
+            <motion.div variants={fadeUp}>
+              <Trending />
+            </motion.div>
+
+            <motion.dl
+              variants={fadeUp}
+              className="mt-8 grid max-w-lg grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-7 sm:grid-cols-4"
+            >
               {[
                 { value: PRODUCTS.length, label: "products live" },
                 { value: CATEGORIES.length, label: "categories" },
@@ -132,41 +130,23 @@ export function Home() {
                 { value: 48, label: "hour delivery", suffix: "h" },
               ].map((s) => (
                 <div key={s.label}>
-                  <dt className="font-mono text-[21px] font-bold text-ink">
+                  <dt className="font-mono text-[23px] font-bold leading-none text-ink">
                     <Counter value={s.value} decimals={s.decimals ?? 0} suffix={s.suffix ?? ""} />
                   </dt>
-                  <dd className="text-xs text-ink-45">{s.label}</dd>
+                  <dd className="mt-1.5 text-[11.5px] leading-tight text-ink-45">{s.label}</dd>
                 </div>
               ))}
             </motion.dl>
           </motion.div>
 
-          {/* The catalogue itself is the hero image. */}
+          {/* The catalogue itself is the hero image, and it never stops moving. */}
           <motion.div
             style={{ y: wallY }}
-            variants={stagger(0.24, 0.055)}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-3 gap-2.5 sm:gap-3"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
           >
-            {wall.map((p, i) => (
-              <motion.div
-                key={p.id}
-                variants={{
-                  hidden: { opacity: 0, y: 26, scale: 0.9, rotate: i % 2 ? 2 : -2 },
-                  show: {
-                    opacity: 1, y: 0, scale: 1, rotate: 0,
-                    transition: { type: "spring", stiffness: 220, damping: 26 },
-                  },
-                }}
-                whileHover={{ y: -6, scale: 1.03 }}
-                className="overflow-hidden rounded-2xl border border-line bg-surface"
-              >
-                <Link to={`/product/${p.id}`} aria-label={p.name}>
-                  <ProductArt product={p} angle={i} className="block aspect-square w-full" />
-                </Link>
-              </motion.div>
-            ))}
+            <HeroWall />
           </motion.div>
         </motion.div>
 
@@ -273,6 +253,75 @@ export function Home() {
 
       <QuickView product={quick} onClose={() => setQuick(null)} />
     </>
+  );
+}
+
+/* ── Hero details ───────────────────────────────────────────── */
+
+/**
+ * A drawn stroke under the last line of the headline, rather than a border:
+ * it overshoots the text on both ends and thins at the tail, which is what
+ * makes it read as a mark someone made instead of a rule the browser drew.
+ */
+function Underline() {
+  return (
+    <svg
+      viewBox="0 0 300 16"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute -bottom-1 left-0 h-[0.22em] w-full overflow-visible"
+      aria-hidden
+    >
+      <motion.path
+        d="M3 11.5C58 5 132 3.2 205 5.6c31 1 62 3.2 92 6.4"
+        fill="none"
+        stroke="#F08000"
+        strokeWidth="4"
+        strokeLinecap="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 0.9, delay: 0.85, ease: EASE }}
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
+/** Cycles the best-reviewed products so the hero has a pulse of its own. */
+function Trending() {
+  const picks = [...PRODUCTS].sort((a, b) => b.reviews - a.reviews).slice(0, 5);
+  const [at, setAt] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setAt((i) => (i + 1) % picks.length), 3200);
+    return () => window.clearInterval(id);
+  }, [picks.length]);
+
+  const product = picks[at];
+
+  return (
+    <p className="mt-5 flex items-center gap-2.5 text-[13px] text-ink-45">
+      <TrendingUp size={14} className="shrink-0 text-marigold-deep" />
+      <span className="shrink-0">Trending now</span>
+      <span className="relative block h-5 min-w-0 flex-1 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={product.id}
+            initial={{ y: 14, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -14, opacity: 0 }}
+            transition={{ duration: 0.32, ease: EASE }}
+            className="absolute inset-0 flex items-center"
+          >
+            <Link
+              to={`/product/${product.id}`}
+              className="truncate font-semibold text-ink hover:text-violet"
+            >
+              {product.name}
+            </Link>
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </p>
   );
 }
 

@@ -28,11 +28,16 @@ export default {
       keyframes: {
         shimmer: { from: { backgroundPosition: "200% 0" }, to: { backgroundPosition: "-200% 0" } },
         "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },
+        "scroll-up": { from: { transform: "translateY(0)" }, to: { transform: "translateY(-50%)" } },
+        "scroll-down": { from: { transform: "translateY(-50%)" }, to: { transform: "translateY(0)" } },
+        "draw": { from: { strokeDashoffset: "1" }, to: { strokeDashoffset: "0" } },
         marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(-50%)" } },
       },
       animation: {
         shimmer: "shimmer 1.1s linear infinite",
         "fade-in": "fade-in 0.45s ease-out both",
+        "scroll-up": "scroll-up 44s linear infinite",
+        "scroll-down": "scroll-down 44s linear infinite",
         marquee: "marquee 28s linear infinite",
       },
     },
