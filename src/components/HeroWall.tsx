@@ -9,17 +9,53 @@ import { ProductArt } from "./ProductArt";
  * needs colour in every column, and packshots photographed on white paper
  * vanish against the tile. The middle column travels the other way, which is
  * what stops the whole thing reading as one sheet sliding past.
+ *
+ * Three per column is the floor for a seamless loop: the list is rendered
+ * twice and translated by half its height, so half the strip has to be taller
+ * than the column or a gap opens at the turn.
  */
 const COLUMNS: [string[], string[], string[]] = [
-  ["f4", "g3", "h4", "s1", "b2"],
-  ["e2", "h3", "f1", "g1", "s3"],
-  ["e4", "t1", "f3", "g4", "s5"],
+  ["f4", "g3", "h4"],
+  ["e2", "h3", "f1"],
+  ["e4", "t1", "g4"],
 ];
 
-const SPEED = ["44s", "52s", "38s"];
+const SPEED = ["34s", "40s", "29s"];
 
 function pick(ids: string[]): Product[] {
   return ids.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean) as Product[];
+}
+
+/**
+ * True while the page is being scrolled, false once it has been still for a
+ * moment. Only flips on the transition, so scrolling does not re-render on
+ * every frame.
+ */
+function useScrolling(idleMs = 180): boolean {
+  const [scrolling, setScrolling] = useState(false);
+  const active = useRef(false);
+
+  useEffect(() => {
+    let timer = 0;
+    const onScroll = () => {
+      if (!active.current) {
+        active.current = true;
+        setScrolling(true);
+      }
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        active.current = false;
+        setScrolling(false);
+      }, idleMs);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(timer);
+    };
+  }, [idleMs]);
+
+  return scrolling;
 }
 
 function Tile({ product, eager }: { product: Product; eager: boolean }) {
@@ -33,7 +69,7 @@ function Tile({ product, eager }: { product: Product; eager: boolean }) {
       <ProductArt
         product={product}
         priority={eager}
-        sizes="(min-width: 1024px) 15vw, 30vw"
+        sizes="(min-width: 1024px) 16vw, 30vw"
         className="block aspect-square w-full transition-transform duration-700 group-hover:scale-[1.06]"
       />
     </Link>
@@ -43,10 +79,13 @@ function Tile({ product, eager }: { product: Product; eager: boolean }) {
 export function HeroWall() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
+  const scrolling = useScrolling();
 
-  // Three columns of images animating forever is not free, and once the hero
-  // has scrolled away nobody can see them. Stopping the animation off-screen
-  // is most of the difference between a smooth page and a stuttering one.
+  // Two reasons to hold still. Off-screen is obvious — nobody can see it. The
+  // other is that animating eighteen photographs while the page is moving is
+  // what made scrolling stutter: measured on production, it was the difference
+  // between one frame in four missing its deadline and one in nine. It starts
+  // again a moment after you stop, which is when you are actually looking.
   const [onScreen, setOnScreen] = useState(true);
 
   useEffect(() => {
@@ -59,7 +98,7 @@ export function HeroWall() {
     return () => io.disconnect();
   }, []);
 
-  const running = !reduce && onScreen;
+  const running = !reduce && onScreen && !scrolling;
 
   return (
     <div
@@ -76,24 +115,21 @@ export function HeroWall() {
       <div className="grid h-full grid-cols-3 gap-2.5 sm:gap-3">
         {COLUMNS.map((ids, col) => {
           const items = pick(ids);
-          // The list is rendered twice so translating by half its height lands
-          // exactly where it started and the loop has no seam.
           const loop = [...items, ...items];
 
           return (
             <div key={col} className="relative overflow-hidden">
               <div
                 className={`flex flex-col gap-2.5 sm:gap-3 ${
-                  running
-                    ? `${col === 1 ? "animate-scroll-down" : "animate-scroll-up"} group-hover/wall:[animation-play-state:paused]`
-                    : ""
-                }`}
+                  reduce ? "" : col === 1 ? "animate-scroll-down" : "animate-scroll-up"
+                } group-hover/wall:[animation-play-state:paused]`}
                 style={{
-                  // Its own compositor layer, so scrolling the page does not
-                  // repaint fifteen photographs on every frame.
-                  willChange: running ? "transform" : undefined,
+                  // Its own compositor layer, so page scroll moves it rather
+                  // than repainting the photographs inside it.
                   transform: "translateZ(0)",
-                  animationDuration: running ? SPEED[col] : undefined,
+                  willChange: "transform",
+                  animationDuration: SPEED[col],
+                  animationPlayState: running ? "running" : "paused",
                 }}
               >
                 {loop.map((p, i) => (
