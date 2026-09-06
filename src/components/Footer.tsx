@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CATEGORIES } from "@/data/catalogue";
+import { Logo } from "./Logo";
 
 const COLUMNS: [string, string[]][] = [
   ["Support", ["Track an order", "Returns and refunds", "Delivery areas", "Contact us"]],
@@ -11,10 +12,9 @@ export function Footer() {
     <footer className="mt-16 bg-ink text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4 sm:px-6">
         <div>
-          <p className="font-display text-[27px] font-extrabold tracking-tightest">shob</p>
-          <p className="mt-2 max-w-xs text-[13.5px] leading-relaxed text-white/60">
-            Eight categories, one bag, one checkout. Every product image on this site is drawn in
-            code — nothing is loaded from a stock library.
+          <Logo tone="light" />
+          <p className="mt-4 max-w-xs text-[13.5px] leading-relaxed text-white/60">
+            Eight categories, one bag, one checkout. Built in Rajshahi, delivering nationwide.
           </p>
           <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-marigold">
             Dhaka · Rajshahi · Chattogram

@@ -291,7 +291,7 @@ export const SEED_PRODUCTS: Product[] = [
     specs: [["Pieces", "60"], ["Wood", "Rubberwood"], ["Paint", "Water based"], ["Age", "3+"]],
   },
   {
-    id: "t2", cat: "kids", name: "Rocket Night Light", brand: "Lumen",
+    id: "t2", cat: "kids", name: "Dino Night Light", brand: "Lumen",
     price: 1450, rating: 4.6, reviews: 266, stock: 62,
     blurb: "A soft amber glow on a two-hour timer, rechargeable over USB-C.",
     specs: [["Light", "Amber, dimmable"], ["Battery", "20 hours"], ["Timer", "30/60/120 min"], ["Charge", "USB-C"]],
@@ -309,7 +309,7 @@ export const SEED_PRODUCTS: Product[] = [
     specs: [["Parts", "80"], ["Builds", "12"], ["Motor", "Included"], ["Age", "8+"]],
   },
   {
-    id: "t5", cat: "kids", name: "Soft Tiger, 40cm", brand: "Anokha",
+    id: "t5", cat: "kids", name: "Soft Teddy, 40cm", brand: "Anokha",
     price: 1250, old: 1500, rating: 4.9, reviews: 723, stock: 49, badge: "Bestseller",
     blurb: "Recycled-fibre fill, embroidered eyes, and it survives the washing machine.",
     specs: [["Height", "40cm"], ["Fill", "Recycled fibre"], ["Eyes", "Embroidered"], ["Wash", "Machine safe"]],

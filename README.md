@@ -4,11 +4,17 @@ An eight-category e-commerce front end built as a portfolio piece. Search, filte
 variant selection, a persistent bag, and a three-step checkout with Bangladeshi
 payment options.
 
-Every product image is drawn in code as an SVG, so the catalogue has no external
-image dependencies, nothing can 404, and the whole site ships in one bundle. Each
-of the forty products has its own drawing in `src/components/product-art/scenes.tsx`
-— the ultrabook looks like an ultrabook, the saree like a saree — and the four
-gallery thumbnails move the camera over that one drawing rather than recolouring it.
+Each of the forty products is photographed twice — a packshot and a second look —
+and both frames are self-hosted in `public/products` as 760px square JPEGs, so
+the site has no runtime dependency on an image CDN. The four gallery thumbnails
+are built out of those two frames: each is shown whole, then punched in on the
+part worth a second look, which is what a store with a two-shot budget actually
+ships. Products the admin panel invents after the shoot have no photography, so
+they fall back to a drawn category shape rather than a broken image.
+
+Photographs come from [Unsplash](https://unsplash.com/license), whose licence
+allows commercial use without attribution; the resolved source ids are listed in
+[`CREDITS.md`](CREDITS.md) anyway.
 
 ## Run it
 
@@ -63,8 +69,9 @@ a link someone can send:
 Defaults are never written, so a plain `/shop` stays plain. Anything unrecognised
 in a hand-edited URL falls back to its default rather than throwing.
 
-**Product pages** — four generated angles, colour and size variants, quantity
-stepper, spec table, stock signalling, and related items from the same category.
+**Product pages** — a four-view gallery built from the two photographs, colour and
+size variants, quantity stepper, spec table, stock signalling, and related items
+from the same category.
 
 **Quick view** — the same buy panel in a modal, reachable from any card without
 leaving the grid.
@@ -108,9 +115,9 @@ or cancel while it is still in the warehouse.
 **Products** — the full catalogue with search, category and stock filters, sorting,
 and bulk select for deleting or restocking. The editor validates as a shop owner
 would want: a struck-through price has to be higher than the live one, stock has to
-be a whole number, a rating has to fit on a five-star scale. Every catalogue
-product has its own drawing, and a product added in the panel falls back to a
-generic shape for its category, so adding one needs no image upload.
+be a whole number, a rating has to fit on a five-star scale. A product added in the
+panel has no photography, so it falls back to a drawn shape for its category and
+adding one needs no image upload.
 
 **Customers** — derived from the orders rather than stored separately, keyed by phone
 number, with lifetime spend, order count, and a per-person history.
@@ -159,8 +166,8 @@ components that animate continuously.
 ```
 src/
   components/    Header, CartDrawer, QuickView, ProductCard, FilterPanel,
-                 ProductArt, AuroraField, Reveal, Toaster, Footer, Skeleton
-    product-art/ scenes.tsx — one SVG drawing per catalogue product
+                 ProductArt, AuroraField, Reveal, Toaster, Footer, Skeleton,
+                 Logo, product-photos.ts — the photographed-product registry
   pages/         Home, Shop, ProductPage, Saved, Checkout, NotFound
   store/         shop.tsx         — provider: reducer, persistence, hydration
                  shop-context.ts  — context, useShop, the value's types

@@ -6,6 +6,7 @@ import { CATEGORIES } from "@/data/catalogue";
 import { useShop } from "@/store/shop-context";
 import { useHotkey } from "@/hooks/useKeyboard";
 import { spring } from "@/lib/motion";
+import { Logo } from "./Logo";
 
 export function Header() {
   const { count, wishlist, currency, setCurrency, openCart } = useShop();
@@ -46,13 +47,8 @@ export function Header() {
       />
 
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
-        <Link to="/" className="flex shrink-0 items-baseline gap-1.5">
-          <span className="font-display text-[23px] font-extrabold tracking-tightest text-ink">
-            shob
-          </span>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-violet sm:inline">
-            everything
-          </span>
+        <Link to="/" className="shrink-0" aria-label="Shob — home">
+          <Logo />
         </Link>
 
         <form onSubmit={submit} className="mx-2 hidden min-w-0 flex-1 md:block" role="search">

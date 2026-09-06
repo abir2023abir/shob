@@ -14,6 +14,13 @@ import { QuickView } from "@/components/QuickView";
 
 const HEADLINE = ["Everything you", "actually need,", "in one bag."];
 
+/**
+ * The hero wall is hand-picked rather than sliced off the catalogue: it needs
+ * one product from most categories and enough colour between them that the
+ * grid reads as a picture. Anything shot on white paper disappears here.
+ */
+const WALL = ["f4", "e2", "h4", "g3", "s1", "f1", "h3", "t4", "g1"];
+
 const TRUST = [
   { icon: Truck, title: "48-hour delivery", body: "Dhaka and Rajshahi next day, everywhere else within two." },
   { icon: RotateCcw, title: "7-day returns", body: "Send it back unopened and the refund clears in three days." },
@@ -34,7 +41,7 @@ export function Home() {
 
   const featured = PRODUCTS.filter((p) => p.badge).slice(0, 6);
   const reduced = PRODUCTS.filter((p) => p.old).slice(0, 6);
-  const wall = PRODUCTS.filter((_, i) => i % 4 === 1).slice(0, 9);
+  const wall = WALL.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean) as Product[];
 
   const search = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +104,25 @@ export function Home() {
                 Search
               </button>
             </motion.form>
+
+            <motion.div variants={fadeUp} className="mt-4 flex flex-wrap items-center gap-3">
+              <Link
+                to="/shop"
+                className="group inline-flex items-center gap-2 rounded-2xl bg-violet px-5 py-3.5 text-[14.5px] font-semibold text-white shadow-lift transition-colors hover:bg-violet-deep"
+              >
+                Get started
+                <ArrowRight
+                  size={16}
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              </Link>
+              <Link
+                to="/shop?sort=rating"
+                className="inline-flex items-center gap-2 rounded-2xl border border-line bg-surface px-5 py-3.5 text-[14.5px] font-semibold text-ink transition-colors hover:border-ink-20"
+              >
+                Browse best rated
+              </Link>
+            </motion.div>
 
             <motion.dl variants={fadeUp} className="mt-8 flex flex-wrap gap-x-8 gap-y-4">
               {[

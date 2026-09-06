@@ -27,10 +27,12 @@ export default {
       },
       keyframes: {
         shimmer: { from: { backgroundPosition: "200% 0" }, to: { backgroundPosition: "-200% 0" } },
+        "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },
         marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(-50%)" } },
       },
       animation: {
         shimmer: "shimmer 1.1s linear infinite",
+        "fade-in": "fade-in 0.45s ease-out both",
         marquee: "marquee 28s linear infinite",
       },
     },

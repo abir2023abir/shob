@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowRight, Eye, EyeOff, Lock, ShieldAlert, User } from "lucide-react";
 import { AuroraField } from "@/components/AuroraField";
+import { LogoMark } from "@/components/Logo";
 import { fadeUp, stagger } from "@/lib/motion";
 import { Field } from "../components/ui";
 import { useAdminAuth } from "../auth/auth-context";
@@ -44,12 +45,15 @@ export function Login() {
         className="relative w-full max-w-sm"
       >
         <motion.div variants={fadeUp} className="text-center">
-          <Link to="/" className="inline-flex items-baseline gap-1.5">
-            <span className="font-display text-[26px] font-extrabold tracking-tightest text-ink">
-              shob
-            </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-violet">
-              admin
+          <Link to="/" className="inline-flex items-center gap-2.5">
+            <LogoMark className="h-9 w-9" />
+            <span className="flex items-baseline gap-1.5">
+              <span className="font-display text-[26px] font-extrabold tracking-tightest text-ink">
+                shob
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-violet">
+                admin
+              </span>
             </span>
           </Link>
           <h1 className="mt-4 text-[26px] font-extrabold text-ink">Sign in to the panel</h1>

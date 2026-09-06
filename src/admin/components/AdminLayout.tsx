@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { overlay, spring, toastIn } from "@/lib/motion";
+import { LogoMark } from "@/components/Logo";
 import { useAdminAuth } from "../auth/auth-context";
 import { useAdmin } from "../data/admin-context";
 
@@ -39,12 +40,15 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const rail = (
     <div className="flex h-full flex-col">
       <div className="px-5 py-5">
-        <Link to="/admin" className="flex items-baseline gap-1.5">
-          <span className="font-display text-[21px] font-extrabold tracking-tightest text-white">
-            {settings.storeName.toLowerCase()}
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-marigold">
-            admin
+        <Link to="/admin" className="flex items-center gap-2.5">
+          <LogoMark className="h-8 w-8" />
+          <span className="flex items-baseline gap-1.5">
+            <span className="font-display text-[21px] font-extrabold tracking-tightest text-white">
+              {settings.storeName.toLowerCase()}
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-marigold">
+              admin
+            </span>
           </span>
         </Link>
       </div>
